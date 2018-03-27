@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>树</title>
+<script>
+function Node(data) {
+	this.data = data;
+	this.left = null;
+	this.right = null;
+}
+var preStr = 'abdh--i--e-j--cf-k--g--'; //前序字符串
+var count = 0;
+function createTree(preStr) {
+	var root;
+	var c = preStr.substr(count, 1);
+	if('-' !== c) {
+		root = new Node(c);
+		count++;
+		root.left = createTree(preStr);
+		count++;
+		root.right = createTree(preStr);
+	}
+	return root;
+}
+function prePrint(root){
+	//console.log('root.data', root.data)
+	//if(root.left != null) {
+	//	prePrint(root.left);
+	//}
+	//if(root.right != null) {
+	//	prePrint(root.right);
+	//}
+	if(root){
+		console.log('root.data pre', root.data);
+		prePrint(root.left);
+		prePrint(root.right);
+	}
+}
+function minPrint(root){
+	//if(root.left != null) {
+	//	minPrint(root.left);
+	//}
+	//console.log('root.data min', root.data);
+	//if(root.right != null) {
+	//	minPrint(root.right);
+	//}
+	if(root){
+		minPrint(root.left);
+		console.log('root.data min', root.data);
+		minPrint(root.right);
+	}
+}
+var tree = createTree(preStr);
+prePrint(tree);
+console.log('------------------');
+minPrint(tree);
+
+</script>
+</head>
+<body>
+
+<div>
+树
+</div>
+</body>
+</html>

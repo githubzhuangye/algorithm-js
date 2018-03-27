@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>栈</title>
+<script>
+//栈
+function Stack() {
+	var items = [];
+	//压栈
+	this.push = function (ele) {
+		items.push(ele);
+	};
+	//出栈
+	this.pop = function() {
+		return items.pop();
+	}
+	//查看最后一个元素
+	this.peek = function() {
+		return items[items.length - 1];
+	}
+	//清除数据
+	this.clear = function() {
+		return items = [];
+	}
+	//是否为空
+	this.isEmpty = function() {
+		return items.length === 0;
+	}
+	//获取长度
+	this.getSize = function() {
+		return items.length
+	}
+}
+//十转二
+function decToBin(decNumber) {
+	var remStact = new Stack();
+	var rem, binString = '';
+	while(decNumber > 0){
+		rem = Math.floor(decNumber%2);
+		remStact.push(rem);
+		decNumber = Math.floor(decNumber/2);
+	}
+	while(!remStact.isEmpty()){
+		binString += remStact.pop().toString();
+	}
+	return binString;	
+}
+//二转十
+function binToDec(binNumber) {
+	var binNumStr = binNumber.toString();
+	var remStack = new Stack();
+	var decNum = 0, stackSize = 0;
+	for(var i = 0; i < binNumStr.length; i++ ) {
+		remStack.push(binNumStr.substr(i, 1));
+	}
+	stackSize = remStack.getSize();
+	for(var j = 0; j < stackSize; j++ ) {
+		var pow = Math.pow(2,j);
+		var temp = remStack.pop();
+		var sum =  pow * temp;
+		console.log('pow * temp  sum', sum);
+		decNum = decNum + sum;
+	}
+	
+	return decNum;
+}
+//逆波兰表达式
+function inversePoland(expression) {
+	if(expression.length < 1) {
+		console.error('表达式错误！');
+		return -1;
+	}
+	var remStack = new Stack();
+	var expArr = expression.split(' ');
+	var popA, popB;
+	for(var i = 0; i < expArr.length; i++ ) {
+		switch(expArr[i]) {
+			case '+': 
+			  popA = remStack.pop();
+			  popB = remStack.pop();
+			  remStack.push(popA + popB);
+			  break;
+			case '-': 
+			   popA = remStack.pop();
+			  popB = remStack.pop();
+			  remStack.push(popB - popA);
+			  break;
+			case '*': 
+			   popA = remStack.pop();
+			  popB = remStack.pop();
+			  remStack.push(popA * popB);
+			  break;
+			case '/': 
+			  popA = remStack.pop();
+			  popB = remStack.pop();
+			  if(popA == 0){
+				console.error('除数不能为0！');
+				return -1;
+			  }
+			  remStack.push(popB / popA);
+			  break;
+			default: 
+			  remStack.push(parseFloat(expArr[i]));
+		}
+	}
+	return remStack.pop();
+}
+console.log('inversePoland',inversePoland('7 8 + 5 * 10 6 / -'));
+
+//链式队列
+//节点
+function Node(data) {
+	this.data = data;
+	this.next = null;
+}
+//队列
+function Queue() {
+	var node = new Node(null);
+	this.front = node;
+	this.rear = node;
+}
+//获取长度
+Queue.prototype.size = function() {
+	var length = 0;
+	var node = this.front;
+	while(node != this.rear) {
+		node = node.next;
+		length++;
+	}
+	return length;
+} 
+//插入节点
+Queue.prototype.insert = function(data) {
+	var node = new Node(data);
+	this.rear.next = node;
+	this.rear = node;
+}
+//删除节点
+Queue.prototype.delEle = function() {
+	if(this.size < 1) {
+		return -1;
+	}
+	var p = this.front.next;
+	this.front.next = p.next;
+	if(this.rear = p) {
+		this.rear = this.front;
+	}
+	return p;
+}
+//循环队列
+function CirculateQueue(size) {
+	this.data = new Array(size);
+	this.front = 0;
+	this.rear = 0;
+	this.maxSize = size;
+}
+//长度
+CirculateQueue.prototype.size = function() {
+	return (this.rear - this.front + this.maxSize) % this.maxSize;
+}
+//插入元素
+CirculateQueue.prototype.insert = function(elm) {
+	//if(this.size() == this.maxSize){
+	//	console.error('队列已满！');
+	//	return -1;
+	//}
+	if((this.rear + 1) % this.maxSize == this.front){
+		console.error('队列已满！');
+		return -1;
+	}
+	this.data[this.rear] = elm;
+	this.rear = (this.rear + 1)%this.maxSize;
+	return 0;
+}
+//删除元素
+CirculateQueue.prototype.delEle = function() {
+	if(0 === this.size()){
+		console.error('队列为空！');
+		return -1;
+	}
+	this.front = (this.front + 1)%this.maxSize;
+	return 0;
+}
+//斐波那挈
+function fibonaqie(i) {
+	var arr = new Array(i);
+	arr[0] = 1;
+	arr[1] = 1;
+	for(var j = 2; j < i; j++) {
+		arr[j] = arr[j-1] + arr[j-2];
+	}
+	return arr[i-1];
+}
+function fibonaqie2(i) {
+	if(i < 2) {
+		return i === 0 ? 0 : 1;
+	}
+	return fibonaqie2(i - 1) + fibonaqie2(i - 2)
+}
+console.log(fibonaqie(5));
+console.log('2',fibonaqie2(5));
+//递归
+function recurren(strIn, pos, strOut) {
+	if(pos < 0) {
+		return strOut;
+	}
+	strOut = strOut + strIn.charAt(pos--);
+	return recurren(strIn, pos, strOut);
+}
+//递归2
+function recurren1(strIn, strOut) {
+	var lengt = strIn.length - 1;
+	if(lengt < 0) {
+		return strOut;
+	}
+	strOut = strOut + strIn.charAt(lengt);
+	strIn = strIn.substr(0, lengt);
+	return recurren1(strIn, strOut);
+}
+//var strIn = '123456789';
+//var strOut = '', length = strIn.length -1;
+//console.log(recurren(strIn,length, strOut));
+//console.log('213',recurren1(strIn, strOut));
+
+//汉诺塔
+var count = 0;
+function hannoiTower(num, x, y, z) {
+	count ++;
+	if(1 === num) {
+		console.log(x,' --> ', z);
+	} else {
+		hannoiTower(num-1, x, z, y); //借助z将n-1个从x移动到y
+		console.log(x,' --> ', z); 
+		hannoiTower(num-1, y, x, z); //借助x将n-1个从y移动到z
+	}
+	
+}
+//hannoiTower(10, 'x', 'y', 'z');
+//console.log('count', count);
+
+</script>
+</head>
+<body>
+栈是一个后进先出的队列
+<div>
+//这个是等于号
+data = '[
+  {
+    "name": "abc",
+    "age": 20,
+  },
+  {
+    "name": "abc",
+    "age": 20,
+  }
+]'
+
+//这个是冒号
+{
+  data: '[
+    {
+      "name": "abc",
+      "age": 20,
+    },
+    {
+      "name": "abc",
+      "age": 20,
+    }
+  ]'
+}
+</div>
+</body>
+</html>
