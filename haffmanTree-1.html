@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>哈夫曼树1</title>
+<script>
+//计算字符出现的频率
+function frequencies(str) {
+	if(!str) {
+		return -1;
+	}
+	var hash = {};
+	for(var i = 0; i < str.length; i++) {
+		var c = str.charAt(i);
+		if(hash[c]) {
+			hash[c]++;
+		} else {
+			hash[c] = 1;
+		}
+	}
+	return Object.keys(hash).map(function(key) {
+		return {
+			char: key,
+			weight: hash[key]
+		}
+	});
+}
+
+//交换数组元素
+function swap(arr, i, j) {
+	var temp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = temp; 
+}
+//冒两次泡，获取权重最小的元素
+function bubbleTwice(arr) {
+	for(var i = 0; i < 2; i++) {
+		for(var j = 0; j < arr.length - i -1; j++) {
+			if(arr[j].weight < arr[j+1].weight) {
+				swap(arr, j, j+1);
+			}
+		}
+	}
+}
+//创建haffman树
+function createTree(freArr) {
+	var root;
+	while(freArr.length > 1){
+		bubbleTwice(freArr);
+		var left = freArr.pop();
+		var right = freArr.pop();
+		left.code = 0;
+		right.code = 1;
+		var parent = {
+			char: null,
+			weight: left.weight + right.weight,
+			left: left,
+			right: right
+		}
+		root = parent;
+		freArr.push(parent)
+	}
+	return root;
+}
+//遍历哈夫曼树，获取字符和哈夫曼编码
+function mapHoffmanTree(hfTree) {
+	var map = {};
+	var traverse = function(parent, path) {
+		if(parent.left || parent.right) {
+			if(parent.left) {
+				traverse(parent.left, path + parent.left.code);
+			}
+			if(parent.right) {
+				traverse(parent.right, path + parent.right.code);
+			}
+		} else {
+			map[parent['char']] = path;
+		}
+	}
+	traverse(hfTree, '');
+	console.log('map',JSON.stringify(map));
+	return map;
+}
+//字符编码
+function encode(hoffMap, str) {
+	var encodeStr = '';
+	while(str) {
+		var c = str.slice(0, 1);
+		str = str.slice(1);
+		console.log(c);
+		console.log(str);
+		encodeStr += hoffMap[c];
+	}
+	return encodeStr;
+}
+
+//解码
+function decode(hoffMap, encodeStr) {
+	var decodeStr = '';
+	sign:
+	while(encodeStr) {
+		for(var key in hoffMap) {
+			var index = encodeStr.indexOf(hoffMap[key]);
+			if(0 === index) {
+				encodeStr = encodeStr.slice(hoffMap[key].length);
+				decodeStr += key;
+				continue sign;
+			}
+		}
+		//return null;
+	}
+	return decodeStr;
+}
+var str = 'aabb11456qaa';
+var freArr = frequencies(str);
+console.log(JSON.stringify(freArr));
+var tree = createTree(freArr);
+console.log('tree',tree);
+var hoffMap = mapHoffmanTree(tree);
+var encodeStr = encode(hoffMap, str);
+document.write('encode:' + encodeStr+ '<br />');
+var decodeStr = decode(hoffMap, encodeStr);
+document.write('decode:' +decodeStr);
+</script>
+</head>
+<body>
+
+<div>
+哈夫曼树
+</div>
+</body>
+</html>
