@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>图</title>
+<script>
+var X = 4, Y = 4;
+var chess = initChess(X, Y);
+//初始化棋盘
+function initChess(x, y) {
+	var chess = [];
+	for(var i = 0; i < x; i++) {
+		chess[i] = [];
+		for(var j = 0; j < y; j++) {
+			console.log()
+			chess[i][j] = 0;
+		}
+	}
+	return chess;
+}
+//打印棋盘
+function printChess(chess) {
+	for(var i = 0; i < chess.length; i++) {
+		console.log('\n');
+		for(var j = 0; j < chess[i].length; j++) {
+			console.log(chess[i][j]);
+		}
+	}
+}
+//生成棋盘顶点
+function Node(x, y) {
+	this.x = x;
+	this.y = y;
+}
+//下一个位置
+function nextXY(nextNode, count) {
+	var x = nextNode.x, y = nextNode.y, node;
+	switch(count){
+		case 0: 
+			if(x+2 < X-1 && y-1 >= 0 && chess[x+2][y-1] == 0) {
+				x += 2;
+				y -= 1;
+				node = new Node(x, y);
+				return node;
+			}
+			break;
+		case 1: 
+			if(x+2 < X-1 && y+1 <= Y-1 && chess[x+2][y+1] == 0) {
+				x += 2;
+				y += 1;
+				node = new Node(x, y);
+				return node;
+			}
+			break;
+		case 2: 
+			if(x+1 < X-1 && y-2 >= 0 && chess[x+1][y-2] == 0) {
+				x += 1;
+				y -= 2;
+				node = new Node(x, y);
+				return node;
+			}
+			break;
+		case 3: 
+			if(x+1 < X-1 && y+2 <= Y-1 && chess[x+1][y+2] == 0) {
+				x += 1;
+				y += 2;
+				node = new Node(x, y);
+				return node;
+			}
+			break;
+		case 4: 
+			if(x-1 >= 0 && y-2 >= 0 && chess[x-1][y-2] == 0) {
+				x -= 1;
+				y -= 2;
+				node = new Node(x, y);
+				return node;
+			}
+			break;
+		case 5: 
+			if(x-1 >= 0 && y+2 <= Y-1 && chess[x-1][y+2] == 0) {
+				x -= 1;
+				y += 2;
+				node = new Node(x, y);
+				return node;
+			}
+			break;
+		case 6: 
+			if(x-2 >= 0 && y-1 >= 0 && chess[x-2][y-1] == 0) {
+				x -= 2;
+				y -= 1;
+				node = new Node(x, y);
+				return node;
+			}
+			break;
+		case 7: 
+			if(x-2 >= 0 && y+1 <= Y-1 && chess[x-2][y+1] == 0) {
+				x -= 2;
+				y += 1;
+				node = new Node(x, y);
+				return node;
+			}
+			break;
+		default:
+			break;
+	}
+	return null;
+}
+
+//遍历棋盘
+function teaverChess(node, tag) {
+	var x = node.x, y = node.y, next, count = 0;
+	chess[x][y] = tag;
+	console.log('chess[x][y]',chess[x][y]);
+	if(X*Y == tag) {
+		return 1;
+	}
+	//找到下一个马可走的下一个坐标，如果找到flag=1；否则为0
+	next = nextXY(node, count);
+	while(null == next && count < 7) {
+		count ++;
+		next = nextXY(node, count);
+	}
+	while(next != null) {
+		console.log(JSON.stringify(next));
+		if(teaverChess(next, tag+1)) {
+			return 1;
+		}
+		count ++;
+		next = nextXY(node, count);
+		while(null == next && count < 7) {
+			count ++;
+			next = nextXY(node, count);
+		}
+	}
+	if(null == next) {
+		chess[x][y] = 0;
+	}
+	return 0;
+}
+var node = new Node(0, 0);
+teaverChess(node, 1);
+printChess(chess);
+
+/*
+
+
+*/
+</script>
+</head>
+<body>
+
+<div>
+图
+</div>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>最短路径</title>
+<script>
+// 最短路径——佛洛伊德
+// 顶点
+function Vertex(name) {
+	this.name = name;
+}
+
+// 邻接矩阵
+
+function ArcMat(maxvex) {
+	this.maxvex = maxvex;
+	this.arcnum = 0;
+	this.data = new Array(maxvex);
+	for(var i = 0; i < this.data.length; i++) {
+		this.data[i] = new Array(maxvex);
+		for(var j = 0; j < this.data[i].length; j++) {
+			this.data[i][j] = Infinity;
+			if(i == j){
+				this.data[i][j] = 0;
+			}
+		}
+	}
+}
+
+// 图
+function Mgraph(vertexs) {
+	this.vertexs = vertexs;
+	this.arcMat = new ArcMat(vertexs.length);
+}
+
+// 图添加边
+Mgraph.prototype.addArc = function(begin, end, weight) {
+	var i = this.vertexs.indexOf(begin);
+	var j = this.vertexs.indexOf(end);
+	this.arcMat.data[i][j] = weight;
+	this.arcMat.data[j][i] = weight;
+	this.arcMat.arcnum++;
+}
+
+// floyd
+Mgraph.prototype.shortPath_floyd = function(v0) {
+	console.log('开始初始化：准备计算'+ v0.name,'到各个顶点的最短路径');
+	var v0_index = this.vertexs.indexOf(v0);
+	var pathMatrix = new Array(this.arcMat.maxvex); //最短路径下标数组
+	var shortPathTable = new Array(this.arcMat.maxvex); // 存储到各点的最短路径的权值和
+	
+	for(var i = 0; i < this.arcMat.maxvex; i++) {
+		pathMatrix[i] = new Array(this.arcMat.maxvex);
+		shortPathTable[i] = new Array(this.arcMat.maxvex);
+	}
+
+	for(var i = 0; i < this.arcMat.maxvex; i++) {
+		for(var j = 0; j < this.arcMat.maxvex; j++) {
+			pathMatrix[i][j] = j;
+			shortPathTable[i][j] = this.arcMat.data[i][j];
+		}
+	}
+
+	console.log('初始化完毕：最短路径下标数组pathMatrix', JSON.stringify(pathMatrix));
+	console.log('初始化完毕：最短路径的权值和shortPathTable',JSON.stringify(shortPathTable));
+	for(var i = 0; i < this.arcMat.maxvex; i++) {
+		for(var j = 0; j < this.arcMat.maxvex; j++) {
+			for(var k = 0; k < this.arcMat.maxvex; k++) { // 尝试经过k个点对每对顶点之间的距离进行更新
+				// 调试
+				var temp = this.vertexs[0].name;
+				for(var m = 1; m <= i; m++) {
+    
+					temp += ',' + this.vertexs[m].name;
+				}
+				console.log('检查点', this.vertexs[j].name, '到', this.vertexs[k].name+'， 是否通过点'+temp, '来降低路径');
+				// 调试
+				if(shortPathTable[j][k] > shortPathTable[j][i] + shortPathTable[i][k]) {
+					console.log('成功--------------------------------k', k );
+					console.info('发现由点', this.vertexs[j].name, '到', this.vertexs[i].name,'到', this.vertexs[k].name, '的路径是', (shortPathTable[j][i] + shortPathTable[i][k]));
+					shortPathTable[j][k] = shortPathTable[j][i] + shortPathTable[i][k];
+					pathMatrix[j][k] = pathMatrix[j][i]
+				}
+			}
+			console.log('内--------------------------------j', j );
+		}
+		console.log('外--------------------------------i', i);
+	}
+
+	var temp, tempString;
+	for(var i = 0; i < this.arcMat.maxvex; i++) {
+		for(var j = 1; j < this.arcMat.maxvex; j++) {
+			tempString = '';
+			tempString += i +'-' + j + '最短路径是'+ shortPathTable[i][j] + '; 路径是';
+			temp = pathMatrix[i][j];
+			tempString += i;
+			while(temp != j) {
+				tempString +='->' + temp;
+				temp = pathMatrix[temp][j]
+			}
+			tempString += '->' + j;
+		}
+		console.log(tempString);
+	}
+
+}
+
+var v0 = new Vertex('v0');
+var v1 = new Vertex('v1');
+var v2 = new Vertex('v2');
+var v3 = new Vertex('v3');
+var v4 = new Vertex('v4');
+var vertexs = [v0,v1,v2,v3,v4];
+var mgraph = new Mgraph(vertexs);
+mgraph.addArc(v0, v1, 3);
+mgraph.addArc(v0, v2, 5);
+mgraph.addArc(v1, v2, 10);
+mgraph.addArc(v1, v3, 4);
+mgraph.addArc(v1, v4, 1);
+mgraph.addArc(v2, v3, 5);
+mgraph.addArc(v3, v4, 1);
+mgraph.shortPath_floyd(v0);
+</script>
+</head>
+<body>
+
+<div>
+最短路径——佛洛伊德
+</div>
+</body>
+</html>

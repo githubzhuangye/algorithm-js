@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>图</title>
+<script>
+
+//prim 算法
+function Vertex(name) {
+	this.name = name;
+}
+
+//邻接矩阵
+function ArcMat(maxvex) {
+	this.maxvex = maxvex;
+	this.arcnum = 0;
+	this.data = new Array(maxvex);
+	for(var i = 0; i < this.data.length; i++) {
+		this.data[i] = new Array(maxvex);
+		for(var j = 0; j < this.data[i].length; j++) {
+			this.data[i][j] = Infinity;
+			if(i == j) {
+				this.data[i][j] = 0;
+			}
+		}
+	}
+}
+//图
+function Mgraph(vertexs) {
+	this.arcMat = new ArcMat(vertexs.length);
+	this.vertexs = vertexs;
+}
+
+//添加边，构造无向边
+Mgraph.prototype.addArc = function (start, end, weight){
+	var i = this.vertexs.indexOf(start);
+	var j = this.vertexs.indexOf(end);
+	this.arcMat.data[i][j] = weight;
+	this.arcMat.data[j][i] = weight;
+	this.arcMat.arcnum ++;
+}
+
+//最小生成树， prim
+Mgraph.prototype.miniTreePrim = function() {
+	var result = [];
+	var min, j, k;
+	var adjvex = []; //相关顶点
+	var lowcost = []; //相关顶点的权值
+	lowcost[0] = 0;
+	adjvex[0] = this.vertexs[0];
+	for(var i = 1; i < this.arcMat.maxvex; i++) {
+		lowcost[i] = this.arcMat.data[0][i];
+		adjvex[i] = this.vertexs[0];	
+	}
+	console.log('初始化后lowcost', lowcost);
+	console.log('初始化后adjvex', adjvex);
+	for(var i = 1; i < this.arcMat.maxvex; i++) {
+		min = Infinity;
+		j = 1; k = 0; //k为下要走的点
+		while(j < this.arcMat.maxvex) {
+			if(lowcost[j]!=0 && lowcost[j]<min) {
+				min = lowcost[j];
+				k = j;
+			}
+			j++;
+		}
+		console.log(i, '次,选择出的边'+'('+JSON.stringify(adjvex[k])+','+JSON.stringify(this.vertexs[k])+')');
+		console.log(i, '次之后lowcost', lowcost);
+		console.log(i, '次之后adjvex', adjvex);
+		result.push('选择出的边'+'('+JSON.stringify(adjvex[k])+','+JSON.stringify(this.vertexs[k])+')');
+    		lowcost[k] = 0;//表示本节点已经完成任务
+
+		for(j = 1; j < this.arcMat.maxvex; j++) {
+			console.log('k=',k);
+			if(lowcost[j]!=0 && this.arcMat.data[k][j] < lowcost[j]) {
+				lowcost[j] = this.arcMat.data[k][j];
+        			adjvex[j] = this.vertexs[k];
+			}
+		}
+
+	}
+	return result;
+}
+
+var v0 = new Vertex('V0');
+var v1 = new Vertex('V1');
+var v2 = new Vertex('V2');
+var v3 = new Vertex('V3');
+var v4 = new Vertex('V4');
+var v5 = new Vertex('V5');
+var vertexs = [v0,v1,v2,v3,v4,v5];
+var mgraph = new Mgraph(vertexs);
+mgraph.addArc(v0,v1,6);
+mgraph.addArc(v0,v2,1);
+mgraph.addArc(v0,v3,5);
+mgraph.addArc(v1,v2,5);
+mgraph.addArc(v1,v4,3);
+mgraph.addArc(v2,v3,7);
+mgraph.addArc(v2,v4,5);
+mgraph.addArc(v2,v5,4);
+mgraph.addArc(v3,v5,2);
+mgraph.addArc(v4,v5,6);
+
+console.log(mgraph.arcMat);
+console.log(mgraph.miniTreePrim());
+
+/*
+//Prim算法
+//用邻接矩阵存储一个图
+//顶点
+function Vertex(name) {
+  this.name =name;
+}
+//邻接矩阵
+//maxvex:顶点数
+function arc(maxvex){
+  this.maxvex = maxvex;
+  this.arcnum = 0;
+  this.data = new Array(maxvex);
+  for (var i = 0; i < this.data.length; i++) {
+    this.data[i] = new Array(maxvex);
+    for (var j = 0; j < this.data[i].length; j++) {
+      this.data[i][j] = Infinity;
+      if(i==j){
+        this.data[i][j] = 0;
+      }
+    }
+  }
+}
+//图
+function Mgraph(maxvex,vertexs){
+  this.arc = new arc(maxvex);
+  this.vertexs = vertexs;
+}
+//添加边,构造无向边
+Mgraph.prototype.addArc = function(start,end,length){
+  var i = this.vertexs.indexOf(start);
+  var j = this.vertexs.indexOf(end);
+  this.arc.data[i][j] = length;
+  this.arc.data[j][i] = length;
+  this.arc.arcnum++;
+}
+//最小生成树算法,prim
+Mgraph.prototype.miniSpanTree_Prim = function(){
+  var result = [];
+  var min,j,k;
+  var adjvex = [];//相关顶点下标
+  var lowcost = [];//相关顶点间边的权值
+  lowcost[0] = 0;//表示V0已经完成任务
+  adjvex[0] = this.vertexs[0];
+  for (var i = 1; i < this.arc.maxvex; i++) {
+    lowcost[i] = this.arc.data[0][i];
+    adjvex[i] = this.vertexs[0];
+  }
+  console.info('初始化后的lowcost:'+lowcost);
+  console.info('初始化后的adjvex:'+JSON.stringify(adjvex));
+  for (var i = 1; i < this.arc.maxvex; i++) {
+    min = Infinity;
+    j=1;k=0;
+    while(j<this.arc.maxvex){
+      if(lowcost[j]!=0&&lowcost[j]<min){
+        min = lowcost[j];
+        k=j;
+      }
+      j++;
+    }
+    console.info('选择出的边'+'('+JSON.stringify(adjvex[k])+','+
+      JSON.stringify(this.vertexs[k])+')');
+    result.push('选择出的边'+'('+JSON.stringify(adjvex[k])+','+
+      JSON.stringify(this.vertexs[k])+')');
+    lowcost[k] = 0;//表示本节点已经完成任务
+    console.info('当前的lowcost:'+lowcost+';k='+k);
+    for (j = 1; j < this.arc.maxvex; j++) {
+	var aa = this.arc.data[k][j];
+	console.log(aa);
+      if(lowcost[j]!=0&&this.arc.data[k][j]<lowcost[j]){
+        lowcost[j] = this.arc.data[k][j];
+        adjvex[j] = this.vertexs[k];
+      }
+    }
+    console.info('清理筛选后的lowcost:'+lowcost+';k='+k);
+  }
+  return result;
+}
+//建造一个
+var v0 = new Vertex('V0');
+var v1 = new Vertex('V1');
+var v2 = new Vertex('V2');
+var v3 = new Vertex('V3');
+var v4 = new Vertex('V4');
+var v5 = new Vertex('V5');
+var vertexs = [v0,v1,v2,v3,v4,v5];
+var mgraph = new Mgraph(6,vertexs);
+mgraph.addArc(v0,v1,6);
+mgraph.addArc(v0,v2,1);
+mgraph.addArc(v0,v3,5);
+mgraph.addArc(v1,v2,5);
+mgraph.addArc(v1,v4,3);
+mgraph.addArc(v2,v3,7);
+mgraph.addArc(v2,v4,5);
+mgraph.addArc(v2,v5,4);
+mgraph.addArc(v3,v5,2);
+mgraph.addArc(v4,v5,6);
+console.info(mgraph.arc);
+console.info(mgraph.miniSpanTree_Prim());
+*/
+</script>
+</head>
+<body>
+
+<div>
+图
+</div>
+</body>
+</html>

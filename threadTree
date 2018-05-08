@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>树</title>
+<script>
+function Node(data) {
+	this.data = data;
+	this.left = null;
+	this.right = null;
+	this.LTag = 0; //代表有左孩子
+	this.RTag = 0; //代表有右孩子
+}
+//创建二叉树
+var preStr = 'abdh--i--e-j--cf-k--g--';
+var count = 0;
+function createTree(preStr) {
+	var root;
+	var c = preStr.substr(count, 1);
+	if('-' !== c) {
+		root = new Node(c);
+		count++;
+		root.left = createTree(preStr);
+		count++;
+		root.right = createTree(preStr);
+	}
+	return root;
+}
+//对二叉树进行中序线索化
+function midTraverseThread(node, prev, next) {
+	if(null === node || undefined === node) {
+		return;
+	}
+	
+	if(0 === node.LTag){
+		midTraverseThread(node.left, prev, next);
+	}
+	if(undefined === node.left || null === node){
+		node.LTag = 1;
+		node.left = prev;
+	}
+	if(undefined === node.right || null === node){
+		node.RTag = 1;
+		node.right = next;
+	}
+	if(0 === node.RTag){
+		midTraverseThread(node.right, prev, next);
+	}
+}
+//前序遍历
+function prePrint(root){
+	//console.log('root.data', root.data)
+	//if(root.left != null) {
+	//	prePrint(root.left);
+	//}
+	//if(root.right != null) {
+	//	prePrint(root.right);
+	//}
+	if(root){
+		console.log('root.data pre',root);
+		prePrint(root.left);
+		prePrint(root.right);
+	}
+}
+var tree = createTree(preStr);
+midTraverseThread(tree, tree, tree);
+prePrint(tree);
+</script>
+</head>
+<body>
+
+<div>
+树
+</div>
+</body>
+</html>

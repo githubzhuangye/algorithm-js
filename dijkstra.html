@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>最短路径</title>
+<script>
+//最短路径——迪杰斯特拉
+//顶点
+function Vertex(name) {
+	this.name = name;
+}
+
+//邻接矩阵
+function ArcMat(maxvex) {
+	this.maxvex = maxvex;
+	this.arcnum = 0;
+	this.data = new Array(maxvex);
+	for(var i = 0; i < this.data.length; i++) {
+		this.data[i] = new Array(maxvex);
+		for(var j = 0; j < this.data[i].length; j++) {
+			this.data[i][j] = Infinity;
+			if(i == j) {
+				this.data[i][j] = 0;
+			}
+		}
+	}
+}
+//图, 一个顶点，一个邻接矩阵代表一个图
+function Mgraph(vertexs) {
+	this.arcMat = new ArcMat(vertexs.length);
+	this.vertexs = vertexs;
+}
+
+//添加边，构造无向边
+Mgraph.prototype.addArc = function (start, end, weight){
+	var i = this.vertexs.indexOf(start);
+	var j = this.vertexs.indexOf(end);
+	this.arcMat.data[i][j] = weight;
+	this.arcMat.data[j][i] = weight;
+	this.arcMat.arcnum ++;
+}
+// 迪杰斯特拉
+Mgraph.prototype.shortPath_Dijkstra = function(v0) {
+	var v0_index = this.vertexs.indexOf(v0);
+	var final = []; // 代表当前是否计算出来了结果
+	var pathmatrix = []; // 最短路径下标数组	
+	var shortpathtable = []; // 存储到各点的最短路径的权值和
+	console.log('开始初始化：准备计算', v0.name, '到各个顶点的最短路径');
+	//以输入的v0顶点作为起始点初始化
+	for(var i = 0; i < this.arcMat.maxvex; i++) {
+		final.push(0);
+		shortpathtable.push(this.arcMat.data[v0_index][i]);
+		pathmatrix.push(0);
+	}
+	shortpathtable[v0_index] = 0;
+	final[v0_index] = 1;
+	console.log('初始化final',final);
+	console.log('初始化pathmatrix',pathmatrix);
+	console.log('初始化shortpathtable',shortpathtable);
+
+	var min, k;
+	for(var i = 0; i < this.arcMat.maxvex; i++) {
+		if(i == v0_index) {
+			continue;
+		}
+		min = Infinity;
+		for(var w = 0; w < this.arcMat.maxvex; w++) {
+			if(!final[w] && shortpathtable[w] < min) {
+				k = w;
+				min = shortpathtable[w];
+			}
+		}
+
+		console.log(this.vertexs[k].name, '是最接近当前顶点', v0.name);
+		final[k] = 1;
+		console.log('已经完成对点：', this.vertexs[k].name, '最短路径计算');
+		for(var w = 0; w < this.arcMat.maxvex; w++) {
+			if(!final[w] && (min + this.arcMat.data[k][w]) < shortpathtable[w]) {
+				console.log('因为点：', this.vertexs[k].name, '的参与，发现', this.vertexs[w].name, '到'+v0.name+'的最短路径是', min + this.arcMat.data[k][w]);
+				shortpathtable[w] = min + this.arcMat.data[k][w];
+				pathmatrix[w] = k;
+			}
+		}
+	}
+	console.log('final',final);
+	console.log('pathmatrix', pathmatrix);
+	console.log('shortpathtable',shortpathtable);
+}
+var v0 = new Vertex('v0');
+var v1 = new Vertex('v1');
+var v2 = new Vertex('v2');
+var v3 = new Vertex('v3');
+var v4 = new Vertex('v4');
+var v5 = new Vertex('v5');
+var v6 = new Vertex('v6');
+var v7 = new Vertex('v7');
+var v8 = new Vertex('v8');
+var vertexs = [v0,v1,v2,v3,v4,v5,v6,v7,v8];
+var mgraph = new Mgraph(vertexs);
+mgraph.addArc(v0, v1, 1);
+mgraph.addArc(v0, v2, 5);
+mgraph.addArc(v1, v2, 3);
+mgraph.addArc(v1, v3, 7);
+mgraph.addArc(v1, v4, 5);
+mgraph.addArc(v2, v4, 1);
+mgraph.addArc(v2, v5, 7);
+mgraph.addArc(v3, v4, 2);
+mgraph.addArc(v3, v6, 3);
+mgraph.addArc(v4, v5, 3);
+mgraph.addArc(v4, v6, 6);
+mgraph.addArc(v4, v7, 9);
+mgraph.addArc(v5, v7, 5);
+mgraph.addArc(v6, v7, 2);
+mgraph.addArc(v6, v8, 7);
+mgraph.addArc(v7, v8, 4);
+mgraph.shortPath_Dijkstra(v0);
+</script>
+</head>
+<body>
+
+<div>
+最短路径——dijkstra
+</div>
+</body>
+</html>

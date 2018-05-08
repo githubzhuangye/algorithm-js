@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>哈夫曼树</title>
+<script>
+//计算字符串出现的频率
+function frequencies(str) {
+	var hash = {};
+	for(var i = 0; i < str.length; i++) {
+		var c = str.charAt(i);
+		if(hash[c]) {
+			hash[c] ++;
+		} else {
+			hash[c] = 1;
+		}
+	}
+	return Object.keys(hash).map(function(key) {
+		return [key, hash[key]]
+	});
+}
+//交换数组元素
+function swap(arr, i, j) {
+	var temp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = temp; 
+}
+//冒两次泡，获取权重最小的元素
+function bubbleTwice(arr) {
+	for(var i = 0; i < 2; i++) {
+		for(var j = 0; j < arr.length - i -1; j++) {
+			if(arr[j][1] < arr[j+1][1]) {
+				swap(arr, j, j+1);
+			}
+		}
+	}
+}
+
+//创建哈夫曼树
+function createTree(arr) {
+	while(arr.length > 1) {
+		bubbleTwice(arr);
+		var left = arr.pop();
+		var right = arr.pop();
+		console.log('left',JSON.stringify(left));
+		left.code = 0;
+		right.code = 1;
+		console.log('code',JSON.stringify(left));
+		var parent = [null, left[1] + right[1]];
+		parent.left = left;
+		parent.right = right;
+		arr.push(parent);
+	}
+	console.log('arr[0]',arr[0]);
+	return arr[0];
+}
+
+//遍历哈夫曼树，获取字符和哈夫曼编码
+function mapTree(root) {
+	var map = {};
+	var traverse = function(parent, path) {
+		if(parent) {
+			if(parent.left || parent.right) {
+				if(parent.left) {
+					traverse(parent.left, path + parent.left.code);
+				}
+				if(parent.right) {
+					traverse(parent.right, path + parent.right.code);
+				}
+			} else {
+				if(path) {
+					map[parent[0]] = path;
+				}
+			}
+		}
+	}
+	traverse(root, '');
+	console.log('map',JSON.stringify(map));
+	return map;
+}
+//编码
+function encode(freqs, str) {
+	var root = createTree(freqs);
+	if(root && (root.left || root.right) && !str) {
+		return '';
+	}
+	if(!str) {
+		return null;
+	}
+	var map = mapTree(root);
+	console.log(JSON.stringify(map));
+	var res = '';
+	for(var i = 0; i < str.length; i++) {
+		if(map[str.charAt(i)]) {
+			res += map[str.charAt(i)];
+		} else {
+			return null;
+		}
+	}
+	return res;
+}
+//解码
+function decode(freqs, str) {
+	var root = createTree(freqs);
+	if(root && (root.left || root.right) && !str) {
+		return '';
+	}
+	if(!str) {
+		return null;
+	}
+	var map = mapTree(root);
+	var res = '';
+	sign:
+	while(str) {
+		for(var i in map) {
+			var index = str.indexOf(map[i]);
+			if(0 == index) {
+				res += i;
+				str = str.slice(map[i].length);
+				console.log('str', str)
+				continue sign;
+			}
+		}
+		return null;
+	}
+	return res;
+}
+
+var str = 'abbcdee121212';
+var fq = frequencies(str);
+document.write(JSON.stringify(fq)+ '<br />');
+//createTree(fq);
+var encodedStr = encode(fq, str); 
+document.write(encodedStr + '<br />');
+var decodedStr = decode(fq, encodedStr); 
+document.write(decodedStr);
+</script>
+</head>
+<body>
+
+<div>
+哈夫曼树
+</div>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>二叉排序树</title>
+<script>
+/*
+// 二叉排序树
+function BtreeNode(data) {
+	this.data = data;
+}
+// 添加左孩子
+BtreeNode.prototype.setLeft = function(node) {
+	this.lchild = node;
+}
+// 添加右孩子
+BtreeNode.prototype.setRight = function(node) {
+	this.rchild = node;
+}
+// 搜索二叉排序树
+BtreeNode.prototype.search = function(key) {
+	if(key === this.data) {
+		return {find: true, node: this};
+	} else if(key < this.data) {
+		if(!this.lchild) {
+			return {find: false, node: this};
+		}
+		return this.lchild.search(key);
+	} else {
+		if(!this.rchild) {
+			return {find: false, node: this};
+		}
+		return this.rchild.search(key);
+	}
+}
+// 插入节点
+BtreeNode.prototype.insert = function(key) {
+	var searchRes = this.search(key);
+	if(!searchRes.find) {
+		var s = new BtreeNode(key);
+		if(key < searchRes.node.data) {
+			searchRes.node.lchild = s;
+		} else {
+			searchRes.node.rchild = s;
+		}
+		return true;
+	}
+	return false; // 已经有该数据了
+}
+// 删除节点
+BtreeNode.prototype.delete = function() {
+	if(!this.rchild) {
+		var p = this;
+		p = this.lchild;
+		console.log('!this.rchild p', p);
+	} else if(!this.lchild) {
+		var p = this;
+		p = this.rchild;
+		console.log('!this.lchild p', p);
+	}else {
+		var q = this;
+		var s = this.rchild;
+		while(s.rchild) {
+			q = s;
+			s = s.rchild;
+		}
+		this.data = s.data;
+		if(q != this) {
+			q.rchild = s.lchild;
+		} else {
+			q.lchild = s.lchild;
+			console.log('q.lchild', q.lchild);
+		}
+	}
+}
+// 删除关键字
+BtreeNode.prototype.deleteKey = function (key) {
+	if(this.data == key) {
+		this.delete();
+	} else if(this.data > key) {
+		this.lchild.deleteKey(key);
+	} else {
+		this.rchild.deleteKey(key)
+	}
+}
+*/
+//二叉排序树
+function BtreeNode(data) {
+  this.data = data;
+}
+BtreeNode.prototype.setL = function(node){
+  this.lchild = node;
+}
+BtreeNode.prototype.setR = function(node){
+  this.rchild = node;
+}
+BtreeNode.prototype.search = function(key){
+  if(key == this.data){
+    return {find:true,node:this};
+  }else if(key < this.data){
+    if(!this.lchild){
+      return {find:false,node:this};
+    }
+    return this.lchild.search(key);
+  }else{
+    if(!this.rchild){
+      return {find:false,node:this};
+    }
+    return this.rchild.search(key);
+  }
+}
+BtreeNode.prototype.insert = function(key){
+  var searchResult = this.search(key);
+  if(!searchResult.find){
+    var s = new BtreeNode(key);
+    if(key<searchResult.node.data){
+      searchResult.node.lchild = new BtreeNode(key);
+    }else{
+      searchResult.node.rchild = new BtreeNode(key);
+    }
+    return true;
+  }
+  return false;
+}
+BtreeNode.prototype.delete = function(){
+  if(!this.rchild){
+    var p = this;
+    p = this.lchild;
+  }else if(!this.lchild){
+    var p = this
+    p = this.rchild;
+  }else{
+    var q = this;
+    var s = this.lchild;
+    while(s.rchild){
+      q = s;
+      s = s.rchild;
+    }
+    this.data = s.data;
+    if(q!=this){
+      q.rchild = s.lchild;
+	console.log('q',JSON.stringify(q))
+    }else{
+      q.lchild = s.lchild;
+    }
+  }
+}
+BtreeNode.prototype.deleteKey = function(key){
+  if(this.data == key){
+    this.delete();
+  }else if(this.data>key){
+    this.lchild.deleteKey(key);
+  }else{
+    this.rchild.deleteKey(key);
+  }
+}
+
+
+var array1 = [7,43,86,40,42,15,8];
+//for(var i = 0; i < 5; i++) {
+//	array1[i] = parseInt(Math.random()*100)+1;
+//}
+var b = new BtreeNode(20);
+for(var i = 0; i < array1.length; i++) {
+	b.insert(array1[i]);
+}
+/*
+console.log(array1);
+console.log('b', b);
+console.log(array1[2]);
+console.log(b.search(array1[2]));
+*/
+console.log('b',b, JSON.stringify(b));
+b.deleteKey(array1[1]);
+console.log(b.search(array1[1]));
+console.log('b',b, JSON.stringify(b));
+</script>
+</head>
+<body>
+
+<div>
+二叉排序树
+</div>
+</body>
+
+</html>

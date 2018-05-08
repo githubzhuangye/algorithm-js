@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>最小生成树</title>
+<script>
+//最小生成树——克鲁斯卡尔
+//边集数组基本列
+function Row(begin, end, weight){
+	this.begin = begin;
+	this.end = end;
+	this.weight = weight;
+}
+
+//边集数组
+function Edges(numV) {
+	this.edges = [];
+	this.numV = numV;
+}
+//边集数组添加边
+Edges.prototype.addRow = function(row) {
+	this.edges.push(row);
+}
+//最小生成树算法
+Edges.prototype.miniSpanTree_kruskal = function() {
+	Array.prototype.find = function(f) {
+		var f;
+		while(this[f] > 0) {
+			f = this[f];
+		}
+		return f;
+	}
+	var parent = [];
+	var n, m;
+	for(var i = 0; i < this.numV; i++) {
+		parent.push(0);
+	}
+	for(var i = 0; i < this.edges.length; i++) {
+		n = parent.find(this.edges[i].begin);
+		m = parent.find(this.edges[i].end);
+		
+		if(n !== m) {
+			parent[n] = m
+			console.log('(', this.edges[i].begin, '-', this.edges[i].end, '->', this.edges[i].weight);
+		}
+	}
+}
+
+var edge = new Edges(9);
+edge.addRow(new Row(4,7,7));
+edge.addRow(new Row(2,8,8));
+edge.addRow(new Row(0,1,10));
+edge.addRow(new Row(0,5,11));
+edge.addRow(new Row(1,8,12));
+edge.addRow(new Row(3,7,16));
+edge.addRow(new Row(1,6,16));
+edge.addRow(new Row(5,6,17));
+edge.addRow(new Row(1,2,18));
+edge.addRow(new Row(6,7,19));
+edge.addRow(new Row(3,4,20));
+edge.addRow(new Row(3,8,21));
+edge.addRow(new Row(2,3,22));
+edge.addRow(new Row(3,6,24));
+edge.addRow(new Row(4,5,26));
+edge.miniSpanTree_kruskal();
+</script>
+</head>
+<body>
+
+<div>
+最小生成树——kruskal
+</div>
+</body>
+</html>

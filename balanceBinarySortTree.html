@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>平衡二叉排序树</title>
+<script>
+function BtreeNode(data) {
+	this.data = data;
+	this.bf = 0;
+}
+// 添加左孩子
+BtreeNode.prototype.setLchild = function(node) {
+	this.lchild = node;
+}
+// 添加右孩子
+BtreeNode.prototype.setRchild = function(node) {
+	this.rchild = node;
+}
+// 搜索
+BtreeNode.prototype.search = function(key) {
+	if(key == this.data) {
+		return {find: true, node: this};
+	} else if(key < this.data) {
+		if(!this.lchild) {
+			return {find: false, node: this}
+		}
+		return this.lchild.search(key);
+	} else {
+		if(!this.rchild) {
+			return {find: false, node: this}
+		}
+		return this.rchild.search(key);
+	}
+}
+// 插入
+BtreeNode.prototype.insert = function(key) {
+	var searchRes = this.search(key);
+	if(searchRes.find) {
+		return -1;
+	}
+	var s = new BtreeNode(key);
+	if(key < searchRes.node.data) {
+		searchRes.node.lchild = s;
+	} else {
+		searchRes.node.rchild = s;
+	}
+	return 0;
+}
+// 删除
+BtreeNode.prototype.delete = function() {
+	if(!this.rchild) {
+		var p = this;
+		p = this.lchild;
+	} else if(!this.lchild) {
+		var p = this;
+		p = this.rchild;
+	} else {
+		var q = this;
+		var s = this.lchild;
+		while(s.rchild){
+			q = s;
+			s = s.rchild;
+		}
+		this.data = s.data;
+		if(q != this) {
+			q.rchild = s.lchild;
+		}else{
+		        q.lchild = s.lchild;
+		}
+	}
+}
+// 删除值
+BtreeNode.prototype.deleteKey = function(key) {
+	if(this.data == key) {
+		this.delete();
+	} else if(this.data > key) {
+		this.lchild.deleteKey(key);
+	} else {
+		this.rchild.deleteKey(key);
+	}
+}
+// 计算深度
+function GetBtreeLength(t) {
+	var left = 0, right = 0;
+	if(!t) {
+		return 0;
+	} else if(!t.lchild && !t.rchild){
+		return 1;
+	} else {
+		if(t.lchild) {
+			left = GetBtreeLength(t.lchild);	
+		} 
+		if(t.rchild) {
+			right = GetBtreeLength(t.rchild);
+		}
+		return left > right ? left+1 : right+1;
+	}
+}
+// 设置每个节点的平衡因子
+BtreeNode.prototype.setBF = function() {
+	if(!this) {
+		return;
+	}
+	var left = GetBtreeLength(this.lchild);
+	var right = GetBtreeLength(this.rchild);
+	this.bf = right - left;
+	if(this.lchild) {
+		this.lchild.setBF();
+	}
+	if(this.rchild) {
+		this.rchild.setBF();
+	}
+}
+
+// 右旋
+BtreeNode.prototype.rightRotate = function() {
+	var temp = this.lchild;
+	this.lchild = temp.rchild;
+	var t = deepCopy(this);
+	temp.rchild = t;
+	this.data = temp.data;
+	this.bf = temp.bf;
+	this.lchild = temp.lchild;
+	this.rchild = temp.rchild;
+}
+// 左旋
+BtreeNode.prototype.leftRotate = function() {
+	var temp = this.rchild;
+	this.rchild = temp.lchild;
+	var t = deepCopy(this);
+	temp.lchild = t;
+	this.data = temp.data;
+	this.bf = temp.bf;
+	this.lchild = temp.lchild;
+	this.rchild = temp.rchild;
+}
+// 深拷贝
+function deepCopy(source) {
+	var result = {};
+	for(var key in source) {
+		result[key] = typeof source[key] === 'object' ? deepCopy(source[key]) : source[key]; 
+	}
+	return result;
+}
+// 左旋转平衡
+BtreeNode.prototype.leftBalance = function() {
+	var temp = this.lchild,lr;
+	switch(temp.bf) {
+		case 1:
+			this.bf = temp.bf = 0;
+			this.rightRotate();
+			break;
+		case -1: 
+			lr = temp.rchild;
+			switch(lr.bf) {
+				case 1:
+					this.bf = -1;
+					temp.bf = 0;
+					break;
+				case 0:
+					this.bf = temp.bf = 0;
+					break;
+				case -1:
+					this.bf = 0;
+					temp.bf = 1;
+					break;
+			}	
+		lr.bf = 0;
+		this.lchild.leftRotate();
+		this.rightRotate();	
+	}
+}
+// 右旋转平衡
+BtreeNode.prototype.rightBalance = function() {
+	var temp = this.rchild, lr;
+	switch(temp.bf) {
+		case -1:
+			this.bf = temp.bf = 0;
+			this.leftRotate();
+			break;
+		case 1:
+			lr = temp.lchild;
+			switch(temp.bf) {
+				case 1:
+					this.bf = 1;
+					temp.bf = 0;
+					break;
+				case 0:
+					this.bf = temp.bf = 0;
+					break;
+				case -1:
+					this.bf = 0;
+					temp.bf = -1;
+					break;
+			}
+		lr.bf = 0;
+		this.rchild.rightRotate();
+		this.leftRotate();
+	}
+}
+
+// 插入平衡二叉树
+var taller = false;
+BtreeNode.prototype.insertAVL = function(e) {
+	if(e.data === this.data) {
+		console.log('数值已经存在，无法插入');
+		taller = false;
+		return false;
+	}
+	if(e.data < this.data) {
+		if(!this.lchild) {
+			this.lchild = e;
+			this.lchild.bf = 0;
+			taller = true;
+		} else {
+			if(!this.lchild.insertAVL(e)) {
+				return false;
+			}
+		}
+		if(taller) {
+			console.log('节点是', this.data, '平衡因子是', this.bf);
+			switch(this.bf) {
+				case 1: 
+					this.leftBalance();
+					console.log('对节点左平衡处理');
+					taller = false;
+					break;
+				case 0:
+					this.bf = 1;
+					console.log('变更节点',this.data, '的平衡因子');
+					taller = true;
+					break;
+				case -1:
+					this.bf = 0;
+					console.log('边更节点',this.data, '平衡因子为0');
+					taller = false;
+					break;
+			}
+		}
+	} else {
+		if(!this.rchild) {
+			this.rchild = e;
+			this.rchild.bf = 0;
+			taller = true;
+			console.log('在',this.data, '的右子树添加一个节点', e.data);
+		} else {
+			if(!this.rchild.insertAVL(e)){
+				return false;		
+			}
+		}
+		if(taller) {
+			console.log('节点', this.data, '当前平衡因子是', this.bf);
+			switch(this.bf) {
+				case 1: 
+					this.bf = 0;
+					console.log('边更节点',this.data, '平衡因子为0');
+					taller = false;
+					break;
+				case 0:
+					this.bf = -1;
+					console.log('变更节点',this.data, '的平衡因子');
+					taller = true;
+					break;
+				case -1:
+					this.rightBalance();
+					console.log('对节点右平衡处理');
+					taller = false;
+					break;
+			}
+		}
+	}
+	return true;
+}
+var b = new BtreeNode(0);
+b.insertAVL(new BtreeNode(1));
+b.insertAVL(new BtreeNode(2));
+b.insertAVL(new BtreeNode(3));
+b.insertAVL(new BtreeNode(4));
+b.insertAVL(new BtreeNode(5));
+b.insertAVL(new BtreeNode(6));
+b.insertAVL(new BtreeNode(7));
+b.insertAVL(new BtreeNode(8));
+b.insertAVL(new BtreeNode(9));
+b.insertAVL(new BtreeNode(10));
+b.insertAVL(new BtreeNode(11));
+console.log('b', b);
+</script>
+</head>
+<body>
+
+<div>
+平衡二叉排序树
+</div>
+</body>
+
+</html>

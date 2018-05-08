@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta content="text/html; charset=utf-8">
+<title>查找</title>
+<script>
+// 插值查找 o(log2n)
+Array.prototype.insert_search = function(key) {
+	var low = 0;
+	var high = this.length - 1;
+	var mid, count = 0;
+	while(low <= high) {
+		count++;
+		mid = low + parseInt((high - low) * (key - this[low]) / (this[high] - this[low]));
+		if(key  < this[mid]) {
+			high = mid - 1;
+		} else if(key  > this[mid]) {
+			low = mid + 1;
+		} else {
+			return {index: mid, count: count}
+		}
+	}
+	return -1;
+}
+
+function Fibonacci(k) {
+	if(k == 0 || k == 1) {
+		return k;
+	}
+	return Fibonacci(k-1) + Fibonacci(k-2);
+}
+
+Array.prototype.fibonacci_search1 = function(key) {
+	function F(k) {
+		if(k == 0 || k == 1) {
+			return k;
+		}
+		if(2 === k) {
+			return 1;
+		}
+		var a = 1, b = 1, res;
+		for (var i = 3; i <= k; i++) {
+			res = a + b;
+			a = b;
+			b = res;
+		}
+		return res;
+	}
+	var low = 0;
+	var high = this.length - 1;
+	var count = 0, k = 0;
+	while(this.length > F(k)) {
+		k++;
+		count++;
+	}
+	// 填充数组
+	for(var i = this.length; i < F(k) - 1; i++) {
+		this[i] = this[this.length - 1];
+		count++;
+	}
+	console.log('k1',k,' F(k)', F(5),'填充完的数组11', this);
+	var c = 0;
+	while(low <= high) {
+		c++;
+		count++;
+		mid = low + F(k-1)-1;
+		if(key < this[mid]) {
+			high = mid - 1;
+			k = k - 1;
+		} else if(key > this[mid]) {
+			low = mid + 1;
+			k = k - 2;
+		} else {
+			if(mid <= this.length) {
+				return {index: mid, count: c};
+			} else {
+				return -1;
+			}
+		}
+	}
+	return -1;
+}
+
+
+Array.prototype.fibonacci_search = function(key) {
+	function Fibonacci(k) {
+		if(k == 0 || k == 1) {
+			return k;
+		}
+		return Fibonacci(k-1) + Fibonacci(k-2);
+	}
+	var low = 0;
+	var high = this.length - 1;
+	var count = 0, k = 0;
+	while(this.length > Fibonacci(k)) {
+		k++;
+		count++;
+	}
+	for(var i = this.length; i < Fibonacci(k) - 1; i++) {
+		this[i] = this[this.length - 1];
+		count++;
+	}
+	console.log('k',k,'填充完的数组11', this);
+	// 开始斐波那挈查找
+	var c = 0;
+	while(low <= high) {
+		c++;
+		var mid = low + Fibonacci(k-1) - 1;
+		if(key < this[mid]) {
+			high = mid - 1;
+			k = k - 1;
+		} else if(key > this[mid]) {
+			low = mid + 1;
+			k = k - 2;
+		} else {
+			if(mid <= this.length) {
+				return {index: mid, count: c}
+			} else {
+				return -1;
+			}
+		}
+	}
+	return -1;
+}
+var arr = [3, 12, 14, 20, 23, 29];
+//var base = 0;
+//for(var i = 0; i < 6; i++) {
+//	base += parseInt(Math.random()*10);
+//	arr[i] = base;
+//}
+console.log(arr);
+var res = arr.fibonacci_search1(23);
+console.log(JSON.stringify(res));
+</script>
+</head>
+<body>
+
+<div>
+febonacci查找
+</div>
+</body>
+
+</html>
